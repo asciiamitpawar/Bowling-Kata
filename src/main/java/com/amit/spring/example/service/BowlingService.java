@@ -20,8 +20,17 @@ public class BowlingService {
 	public int letsCalculateBowlingScore() {
 		int score = 0;
 		List<String> seriesOfPinDropSequence = new ArrayList<>();
+		List<String> scoreFrame = new ArrayList<>();
 		seriesOfPinDropSequence = letsBowl();
 		score = getScoreFromPinDropSequence(seriesOfPinDropSequence);
+		for (String str : seriesOfPinDropSequence) {
+			if ("0".equals(str)) {
+				scoreFrame.add("-");
+			} else {
+				scoreFrame.add(str);
+			}
+		}
+		System.out.println("Score Frame : " + scoreFrame);
 		return score;
 	}
 
