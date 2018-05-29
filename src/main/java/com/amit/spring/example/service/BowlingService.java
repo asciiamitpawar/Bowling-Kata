@@ -1,5 +1,9 @@
 package com.amit.spring.example.service;
 
+/**
+ * @author AmitPawar
+ */
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -9,94 +13,141 @@ import org.springframework.stereotype.Service;
 @Service
 public class BowlingService {
 
-	public int calculateScore() {
+	/**
+	 * 
+	 * @return Individual player score of Bowling game.
+	 */
+	public int letsCalculateBowlingScore() {
 		int score = 0;
-		List<String> pinDropSequence = new ArrayList<>();
-		pinDropSequence = letsBowl();
-		for (int count = 0; count < pinDropSequence.size(); count++) {
-			if (pinDropSequence.get(count).equals("X")) {
-				if (pinDropSequence.get(count + 1).equals("X") || pinDropSequence.get(count + 1).equals("/")) {
-					if (pinDropSequence.get(count + 2).equals("X") || pinDropSequence.get(count + 2).equals("/")) {
+		List<String> seriesOfPinDropSequence = new ArrayList<>();
+		seriesOfPinDropSequence = letsBowl();
+		score = getScoreFromPinDropSequence(seriesOfPinDropSequence);
+		return score;
+	}
+
+	/**
+	 * 
+	 * @param seriesOfPinDropSequence
+	 * @return score calculated based on number of rules applied on sequence of pin
+	 *         down.
+	 */
+	public int getScoreFromPinDropSequence(List<String> seriesOfPinDropSequence) {
+		int score = 0;
+		for (int count = 0; count < (seriesOfPinDropSequence.size() - 1); count++) {
+			if (10 == count && seriesOfPinDropSequence.get(count).equals("X")) {
+				break;
+			} else if (seriesOfPinDropSequence.get(count).equals("X")) {
+				if (seriesOfPinDropSequence.get(count + 1).equals("X")) {
+					if (seriesOfPinDropSequence.get(count + 2).equals("X")) {
 						score += 10 + 10 + 10;
 					} else {
-						score += 10 + 10 + Integer.valueOf(pinDropSequence.get(count + 2));
+						score += 10 + 10 + Integer.valueOf(seriesOfPinDropSequence.get(count + 2));
 					}
 				} else {
-					score += 10 + Integer.valueOf(pinDropSequence.get(count + 1))
-							+ Integer.valueOf(pinDropSequence.get(count + 2));
+					score += 10 + Integer.valueOf(seriesOfPinDropSequence.get(count + 1))
+							+ Integer.valueOf(seriesOfPinDropSequence.get(count + 2));
 				}
-			} else if (pinDropSequence.get(count).equals("/")) {
-				if (pinDropSequence.get(count + 1).equals("X") || pinDropSequence.get(count + 1).equals("/")) {
-					score += 10 + 10;
+			} else if (seriesOfPinDropSequence.get(count).equals("/")) {
+				if (seriesOfPinDropSequence.get(count + 1).equals("X")
+						|| seriesOfPinDropSequence.get(count + 1).equals("/")) {
+					score += 10 + 10 - Integer.valueOf(seriesOfPinDropSequence.get(count - 1));
 				} else {
-					score += 10 + Integer.valueOf(pinDropSequence.get(count + 1));
+					score += 10 + Integer.valueOf(seriesOfPinDropSequence.get(count + 1))
+							- Integer.valueOf(seriesOfPinDropSequence.get(count - 1));
 				}
 			} else {
-				score += Integer.valueOf(pinDropSequence.get(count));
+				score += Integer.valueOf(seriesOfPinDropSequence.get(count));
 			}
 		}
 		return score;
 	}
 
+	/**
+	 * 
+	 * @return List of String where each string literal represent sequence of pin
+	 *         down.
+	 */
 	public List<String> letsBowl() {
-		List<String> pinDropSequence = new ArrayList<>();
+		List<String> seriesOfPinDropSequence = new ArrayList<>();
+		List<String> finalRoundPinDropSequence = new ArrayList<>();
 
 		for (int frame = 1; frame <= 10; frame++) {
 			if (10 == frame) {
-				int firstRollPinDown = generateFirstPinDownValue();
-				if (isStrike(firstRollPinDown)) {
-					pinDropSequence.add("X");
-					int bonusFirstRollPinDown = generateFirstPinDownValue();
-					if (isStrike(bonusFirstRollPinDown)) {
-						pinDropSequence.add("X");
-						int bonusSecondRollPinDown = generateFirstPinDownValue();
-						if (isStrike(bonusSecondRollPinDown)) {
-							pinDropSequence.add("X");
-						} else {
-							pinDropSequence.add(String.valueOf(bonusSecondRollPinDown));
-						}
-					} else {
-						pinDropSequence.add(String.valueOf(bonusFirstRollPinDown));
-						int bonusSecondRollPinDown = generateFirstPinDownValue();
-						if (isStrike(bonusSecondRollPinDown)) {
-							pinDropSequence.add("X");
-						} else {
-							pinDropSequence.add(String.valueOf(bonusSecondRollPinDown));
-						}
-					}
-				} else {
-					int secondRollPinDown = generateSecondPinDownValue((10 - firstRollPinDown + 1));
-					if (isSpare(firstRollPinDown, secondRollPinDown)) {
-						pinDropSequence.add("/");
-						int bonusFirstRollPinDown = generateFirstPinDownValue();
-						if (isStrike(bonusFirstRollPinDown)) {
-							pinDropSequence.add("X");
-						} else {
-							pinDropSequence.add(String.valueOf(bonusFirstRollPinDown));
-						}
-					} else {
-						pinDropSequence.add(String.valueOf(firstRollPinDown));
-						pinDropSequence.add(String.valueOf(secondRollPinDown));
-					}
-				}
+				finalRoundPinDropSequence = getFinalRoundScoreSequence();
 			} else {
 				int firstRollPinDown = generateFirstPinDownValue();
 				if (isStrike(firstRollPinDown)) {
-					pinDropSequence.add("X");
+					seriesOfPinDropSequence.add("X");
 				} else {
 					int secondRollPinDown = generateSecondPinDownValue((10 - firstRollPinDown + 1));
 					if (isSpare(firstRollPinDown, secondRollPinDown)) {
-						pinDropSequence.add("/");
+						seriesOfPinDropSequence.add(String.valueOf(firstRollPinDown));
+						seriesOfPinDropSequence.add("/");
 					} else {
-						pinDropSequence.add(String.valueOf(firstRollPinDown));
-						pinDropSequence.add(String.valueOf(secondRollPinDown));
+						seriesOfPinDropSequence.add(String.valueOf(firstRollPinDown));
+						seriesOfPinDropSequence.add(String.valueOf(secondRollPinDown));
 					}
 				}
+			}
+		}
+		for (String str : finalRoundPinDropSequence) {
+			seriesOfPinDropSequence.add(str);
+		}
+		return seriesOfPinDropSequence;
+	}
+
+	/**
+	 * 
+	 * @return List of String where each string literal represent sequence of pin
+	 *         down for final round.
+	 */
+	public List<String> getFinalRoundScoreSequence() {
+		List<String> pinDropSequence = new ArrayList<>();
+		int firstRollPinDown = generateFirstPinDownValue();
+		if (isStrike(firstRollPinDown)) {
+			pinDropSequence.add("X");
+			int bonusFirstRollPinDown = generateFirstPinDownValue();
+			if (isStrike(bonusFirstRollPinDown)) {
+				pinDropSequence.add("X");
+				int bonusSecondRollPinDown = generateFirstPinDownValue();
+				if (isStrike(bonusSecondRollPinDown)) {
+					pinDropSequence.add("X");
+				} else {
+					pinDropSequence.add(String.valueOf(bonusSecondRollPinDown));
+				}
+			} else {
+				pinDropSequence.add(String.valueOf(bonusFirstRollPinDown));
+				int bonusSecondRollPinDown = generateFirstPinDownValue();
+				if (isStrike(bonusSecondRollPinDown)) {
+					pinDropSequence.add("X");
+				} else {
+					pinDropSequence.add(String.valueOf(bonusSecondRollPinDown));
+				}
+			}
+		} else {
+			int secondRollPinDown = generateSecondPinDownValue((10 - firstRollPinDown + 1));
+			if (isSpare(firstRollPinDown, secondRollPinDown)) {
+				pinDropSequence.add(String.valueOf(firstRollPinDown));
+				pinDropSequence.add("/");
+				int bonusFirstRollPinDown = generateFirstPinDownValue();
+				if (isStrike(bonusFirstRollPinDown)) {
+					pinDropSequence.add("X");
+				} else {
+					pinDropSequence.add(String.valueOf(bonusFirstRollPinDown));
+				}
+			} else {
+				pinDropSequence.add(String.valueOf(firstRollPinDown));
+				pinDropSequence.add(String.valueOf(secondRollPinDown));
 			}
 		}
 		return pinDropSequence;
 	}
 
+	/**
+	 * 
+	 * @param pinDown
+	 * @return boolean value in case if it is Strike.
+	 */
 	public boolean isStrike(int pinDown) {
 		boolean result = false;
 		if (10 == pinDown) {
@@ -105,6 +156,12 @@ public class BowlingService {
 		return result;
 	}
 
+	/**
+	 * 
+	 * @param firstRollPinDown
+	 * @param secondRollPinDown
+	 * @return boolean value in case if it is Spare.
+	 */
 	public boolean isSpare(int firstRollPinDown, int secondRollPinDown) {
 		boolean result = false;
 		if (10 == (firstRollPinDown + secondRollPinDown)) {
@@ -112,7 +169,11 @@ public class BowlingService {
 		}
 		return result;
 	}
-	
+
+	/**
+	 * 
+	 * @return Random value generated for first attempt of pin down.
+	 */
 	public int generateFirstPinDownValue() {
 		int pinDown = 0;
 		Random random = new Random();
@@ -120,6 +181,12 @@ public class BowlingService {
 		return pinDown;
 	}
 
+	/**
+	 * 
+	 * @param remainingPin
+	 * @return Random value generated for second attempt of pin down based on
+	 *         remaining pin after first attempt of pin down.
+	 */
 	public int generateSecondPinDownValue(int remainingPin) {
 		int pinDown = 0;
 		Random random = new Random();

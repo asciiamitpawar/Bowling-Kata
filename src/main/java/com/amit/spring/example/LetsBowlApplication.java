@@ -1,5 +1,9 @@
 package com.amit.spring.example;
 
+/**
+ * @author AmitPawar
+ */
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
 import org.springframework.boot.CommandLineRunner;
@@ -14,6 +18,10 @@ public class LetsBowlApplication implements CommandLineRunner {
 	@Autowired
 	BowlingService bowlingService;
 
+	/**
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		SpringApplication app = new SpringApplication(LetsBowlApplication.class);
 		app.setBannerMode(Banner.Mode.OFF);
@@ -22,7 +30,7 @@ public class LetsBowlApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		int score = bowlingService.calculateScore();
+		int score = bowlingService.letsCalculateBowlingScore();
 		System.out.println("##########################");
 		System.out.println("   Final Score is : " + score);
 		System.out.println("##########################");
